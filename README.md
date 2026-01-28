@@ -1,5 +1,7 @@
-# Arkas Template
-A minimal template for Arkas Engine projects
+# Arkas Sandbox
+A sandbox game for Arkas Engine
+
+(NOT A COMPLETE GAME YET!!)
 
 ## How to build
 Clone this repo recursively, then follow these steps:
