@@ -48,10 +48,10 @@ static void Init(Scene* scene) {
 	map.points    = SafeMalloc(4 * sizeof(MapPoint));
 	map.pointsLen = 4;
 
-	map.points[0] = (MapPoint) {{-100.0, -100.0}};
-	map.points[1] = (MapPoint) {{ 100.0, -100.0}};
-	map.points[2] = (MapPoint) {{ 100.0,  100.0}};
-	map.points[3] = (MapPoint) {{-100.0,  100.0}};
+	map.points[0] = (MapPoint) {{-100.0,  100.0}};
+	map.points[1] = (MapPoint) {{ 100.0,  100.0}};
+	map.points[2] = (MapPoint) {{ 100.0, -100.0}};
+	map.points[3] = (MapPoint) {{-100.0, -100.0}};
 
 	map.walls    = SafeMalloc(4 * sizeof(Wall));
 	map.wallsLen = 4;
@@ -90,6 +90,8 @@ static bool HandleEvent(Scene* scene, Event* e) {
 static void Update(Scene* scene, bool top) {
 	(void) scene;
 	(void) top;
+
+	map.sectors[0].floorTexOff.x += engine.delta;
 }
 
 static void Render(Scene* scene) {
