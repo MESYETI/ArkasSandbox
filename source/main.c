@@ -1,11 +1,10 @@
 #include <Arkas/engine.h>
+#include "titleScreen.h"
 
 int main(void) {
-	Engine_Init("Arkas Template");
+	Engine_Init("Arkas Sandbox");
 
-	// usually you would add the first scene here, instead i'm just enabling
-	// the console
-	engine.console = true;
+	SceneManager_AddScene(TitleScreenScene());
 
 	while (engine.running) {
 		Engine_Update();
