@@ -1,6 +1,7 @@
 #include <Arkas/ui.h>
 #include <Arkas/map.h>
 #include <Arkas/mem.h>
+#include <Arkas/audio.h>
 #include <Arkas/camera.h>
 #include <Arkas/engine.h>
 #include <Arkas/skybox.h>
@@ -20,27 +21,27 @@ static void Init(Scene* scene) {
 
 	UI_Row* row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewLabel(&engine.font, "Arkas Sandbox", 0));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewButton("Singleplayer", false, NULL));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewButton("Multiplayer", false, NULL));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewButton("Map Editor", false, NULL));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewButton("Options", false, NULL));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
 	UI_RowAddElement(row, UI_NewButton("Quit", false, NULL));
-	UI_RowFinish(row, true);
+	UI_RowUpdate(row);
 
 	// init map
 	Map_Init();
@@ -76,9 +77,18 @@ static void Init(Scene* scene) {
 	camera.yaw    = -90.0;
 	camera.roll   = 0.0;
 	camera.sector = &map.sectors[0];
+
+	Audio_StartAudio();
+	if (Audio_PlayMusic(":freight/planet-nitron.ogg", false)) {
+		Log("Playing title screen music");
+	}
+	else {
+		Log("Failed to load title screen music");
+	}
 }
 
 static void Free(Scene* scene) {
+	Audio_StopAudio();
 	Map_Free();
 	UI_ManagerFree(&scene->ui);
 }
@@ -92,6 +102,9 @@ static void Update(Scene* scene, bool top) {
 	(void) top;
 
 	map.sectors[0].floorTexOff.x += engine.delta;
+
+	Audio_DefaultState();
+	Audio_Update();
 }
 
 static void Render(Scene* scene) {

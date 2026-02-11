@@ -4,9 +4,10 @@ OBJ   = $(addsuffix .o,$(subst source/,bin/,$(basename ${SRC})))
 OUT   = arkas
 
 FLAGS  = -std=c99 -Wall -Wextra -pedantic -Wuninitialized -Llib/ArkasEngine
+FLAGS += -Ilib/ArkasEngine/lib
 
 # arkas flags here
-FLAGS += -DAE_BACKEND_GL11 -DAE_AUDIO_PSRC -DAE_USE_SDL2
+FLAGS += -DAE_BACKEND_GL_LEGACY -DAE_AUDIO_PSRC -DAE_USE_SDL2
 
 ifeq ($(PLAT), windows)
 	CC     = x86_64-w64-mingw32-gcc
