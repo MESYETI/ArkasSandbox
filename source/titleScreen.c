@@ -104,7 +104,6 @@ static void Update(Scene* scene, bool top) {
 	map.sectors[0].floorTexOff.x += engine.delta;
 
 	Audio_DefaultState();
-	Audio_Update();
 }
 
 static void Render(Scene* scene) {
