@@ -66,11 +66,11 @@ static void Init(Scene* scene) {
 
 	map.sectors[0] = (Sector) {
 		0, 4, 0.5, -0.5, (FVec2) {0.0, 0.0}, (FVec2) {0.0, 0.0}, false, true,
-		Resources_GetRes(":base/3p_textures/grass2.png", 0), NULL
+		Resources_GetRes("base:3p_textures/grass2.png", 0), NULL
 	};
 
 	// load skybox
-	Skybox_Load(":base/skyboxes/05");
+	Skybox_Load("base:skyboxes/05");
 
 	camera.pos    = (FVec3) {0.0, 0.0, 0.0};
 	camera.pitch  = 0.0;
@@ -79,7 +79,7 @@ static void Init(Scene* scene) {
 	camera.sector = &map.sectors[0];
 
 	Audio_StartAudio();
-	if (Audio_PlayMusic(":freight/planet-nitron.ogg", false)) {
+	if (Audio_PlayMusic("freight:planet-nitron.ogg", false)) {
 		Log("Playing title screen music");
 	}
 	else {
