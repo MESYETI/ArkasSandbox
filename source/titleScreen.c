@@ -8,11 +8,91 @@
 #include <Arkas/backend.h>
 #include <Arkas/ui/label.h>
 #include <Arkas/ui/button.h>
+#include <Arkas/ui/listBox.h>
+#include <Arkas/ui/checkBox.h>
 #include <Arkas/resources.h>
 #include "titleScreen.h"
 
-static void Init(Scene* scene) {
-	scene->ui = UI_ManagerInit(1);
+static bool          menuOpen;
+static Scene*        scene;
+static UI_Container* menuCon;
+
+static Vec2 MenuResizer(UI_Container* container) {
+	(void) container;
+
+	return (Vec2) {
+		video.width - (128 + 8) - 8, video.height - 16
+	};
+}
+
+static void OpenMenu(void) {
+	if (menuOpen) {
+		UI_ClearContainer(menuCon);
+		return;
+	}
+
+	menuOpen = true;
+	int x    = 128 + 8;
+
+	menuCon = UI_ManagerAddContainer(
+		scene->ui, video.width - x - 8, &MenuResizer
+	);
+	UI_ContainerAlignLeft(menuCon, x);
+	UI_ContainerAlignTop(menuCon, 8);
+	menuCon->fixedHeight = video.height - 16;
+	UI_ContainerSetPadding(menuCon, 5, 5, 5, 5);
+}
+
+static const char*     mapSelection;
+static bool            inetServer;
+static UI_ListBoxItem* mapList;
+static ResourceFile*   maps;
+static size_t          mapsSize;
+
+static void PlayButton(UI_Button* this, uint8_t button) {
+	(void) this;
+	if (button != 0) return;
+
+	OpenMenu();
+
+	UI_Row* row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowAddElement(row, UI_NewLabel(&engine.font, "Select map", 0));
+	UI_RowUpdate(row);
+
+	row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowUpdate(row);
+
+	row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowAddElement(row, UI_NewCheckBox(&inetServer));
+	UI_RowAddElement(row, UI_NewLabel(&engine.font, "Open server to internet", 0));
+	UI_RowUpdate(row);
+
+	row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowAddElement(row, UI_NewButton("Start Game", false, NULL));
+	UI_RowUpdate(row);
+
+	UI_Row* selectRow = &menuCon->rows[1];
+	selectRow->height = menuCon->fixedHeight - UI_ContainerTotalRowHeight(menuCon);
+	selectRow->autoHeight = false;
+	printf("Row height: %d\n", selectRow->height);
+
+	maps    = Resources_List("maps:", &mapsSize);
+	mapList = SafeMalloc(mapsSize * sizeof(UI_ListBoxItem));
+
+	for (size_t i = 0; i < mapsSize; ++ i) {
+		mapList[i] = (UI_ListBoxItem) {BaseName(maps[i].fullPath)};
+	}
+
+	UI_RowAddElement(selectRow, UI_NewListBox(mapList, mapsSize, &mapSelection, 0, NULL));
+	UI_RowAddElement(selectRow, UI_NewScrollBar(40));
+	UI_RowUpdate(selectRow);
+
+	UI_ContainerUpdateRowY(menuCon);
+}
+
+static void Init(Scene* p_scene) {
+	scene     = p_scene;
+	scene->ui = UI_ManagerInit(2);
 
 	UI_Container* container = UI_ManagerAddContainer(scene->ui, 120, NULL);
 	UI_ContainerAlignLeft(container, 8);
@@ -24,11 +104,11 @@ static void Init(Scene* scene) {
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
-	UI_RowAddElement(row, UI_NewButton("Singleplayer", false, NULL));
+	UI_RowAddElement(row, UI_NewButton("Play", false, &PlayButton));
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
-	UI_RowAddElement(row, UI_NewButton("Multiplayer", false, NULL));
+	UI_RowAddElement(row, UI_NewButton("Join Game", false, NULL));
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
@@ -85,12 +165,16 @@ static void Init(Scene* scene) {
 	else {
 		Log("Failed to load title screen music");
 	}
+
+	menuOpen = false;
 }
 
 static void Free(Scene* scene) {
 	Audio_StopAudio();
 	Map_Free();
 	UI_ManagerFree(scene->ui);
+
+	Resources_FreeFileList(maps, mapsSize);
 }
 
 static bool HandleEvent(Scene* scene, Event* e) {

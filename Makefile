@@ -21,6 +21,11 @@ ifeq ($(BUILD), release)
 	FLAGS += -Ofast -s
 else
 	FLAGS += -g
+
+	ifeq ($(ASAN),y)
+		override FLAGS += -fsanitize=address,undefined
+		override LIBS  += -fsanitize=address,undefined
+	endif
 endif
 
 compile: $(OBJ) $(SRC) $(DEPS)
