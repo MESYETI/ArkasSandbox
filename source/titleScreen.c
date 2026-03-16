@@ -175,6 +175,7 @@ static void Free(Scene* scene) {
 	UI_ManagerFree(scene->ui);
 
 	Resources_FreeFileList(maps, mapsSize);
+	free(mapList);
 }
 
 static bool HandleEvent(Scene* scene, Event* e) {
