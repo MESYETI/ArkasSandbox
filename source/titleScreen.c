@@ -3,6 +3,8 @@
 #include <Arkas/mem.h>
 #include <Arkas/audio.h>
 #include <Arkas/camera.h>
+#include <Arkas/client.h>
+#include <Arkas/config.h>
 #include <Arkas/engine.h>
 #include <Arkas/skybox.h>
 #include <Arkas/backend.h>
@@ -10,6 +12,7 @@
 #include <Arkas/ui/button.h>
 #include <Arkas/ui/listBox.h>
 #include <Arkas/ui/checkBox.h>
+#include <Arkas/ui/textInput.h>
 #include <Arkas/resources.h>
 #include "titleScreen.h"
 
@@ -90,6 +93,70 @@ static void PlayButton(UI_Button* this, uint8_t button) {
 	UI_ContainerUpdateRowY(menuCon);
 }
 
+static char serverIP[64];
+static char serverPort[16];
+
+static void JoinGameButton(UI_Button* this, uint8_t button) {
+	(void) this;
+	if (button != 0) return;
+
+	OpenMenu();
+
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewLabel(&engine.font, "Username:", 0)
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewTextInput(client.name, sizeof(client.name))
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewLabel(&engine.font, "Server IP:", 0)
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewTextInput(serverIP, sizeof(serverIP))
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewLabel(&engine.font, "Server port:", 0)
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewTextInput(serverPort, sizeof(serverPort))
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewButton("Join", false, NULL)
+	));
+}
+
+static void UIScaleButton(UI_Button* this, uint8_t button) {
+	if (button != 0) return;
+
+	int scale = atoi(this->label);
+
+	video.width          = video.aWidth / scale;
+	video.height         = video.aHeight / scale;
+	globalConfig.scale2D = scale;
+}
+
+static void OptionsButton(UI_Button* this, uint8_t button) {
+	(void) this;
+	if (button != 0) return;
+
+	OpenMenu();
+
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewLabel(&engine.font, "Options", 0)
+	));
+
+	UI_Row* row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowAddElement(row, UI_NewLabel(&engine.font, "UI scale:", 0));
+	UI_RowAddElement(row, UI_NewButton("1", false, &UIScaleButton));
+	UI_RowAddElement(row, UI_NewButton("2", false, &UIScaleButton));
+	UI_RowAddElement(row, UI_NewButton("3", false, &UIScaleButton));
+	UI_RowUpdate(row);
+
+	row = UI_ContainerAddRow(menuCon, 0);
+	UI_RowAddElement(row, UI_NewButton("Save settings", false, NULL));
+	UI_RowUpdate(row);
+}
+
 static void Init(Scene* p_scene) {
 	scene     = p_scene;
 	scene->ui = UI_ManagerInit(2);
@@ -108,7 +175,7 @@ static void Init(Scene* p_scene) {
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
-	UI_RowAddElement(row, UI_NewButton("Join Game", false, NULL));
+	UI_RowAddElement(row, UI_NewButton("Join Game", false, &JoinGameButton));
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
@@ -116,7 +183,7 @@ static void Init(Scene* p_scene) {
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
-	UI_RowAddElement(row, UI_NewButton("Options", false, NULL));
+	UI_RowAddElement(row, UI_NewButton("Options", false, &OptionsButton));
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(container, 0);
