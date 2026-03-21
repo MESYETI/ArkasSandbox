@@ -3,6 +3,22 @@
 #include <Arkas/server.h>
 #include <Arkas/engine.h>
 #include "game.h"
+#include "pauseScreen.h"
+
+static bool HandleEvent(Scene* scene, Event* e) {
+	(void) scene;
+
+	switch (e->type) {
+		case AE_EVENT_KEY_DOWN: {
+			if (e->key.key == AE_KEY_ESCAPE) {
+				SceneManager_ScheduleAdd(PauseScreenScene());
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
 
 static void Render(Scene* scene) {
 	(void) scene;
@@ -23,7 +39,7 @@ Scene GameScene(void) {
 		.type        = SCENE_TYPE_GAME,
 		.init        = NULL,
 		.free        = NULL,
-		.handleEvent = NULL,
+		.handleEvent = &HandleEvent,
 		.update      = NULL,
 		.render      = &Render
 	};
@@ -40,4 +56,8 @@ void StartLocalGame(bool inet) {
 
 	// setup client
 	Client_StartLocal();
+}
+
+void StartNetGame() {
+	SceneManager_ScheduleAdd(GameScene());
 }

@@ -13,7 +13,9 @@ int main(int argc, const char** argv) {
 	// SceneManager_AddScene(
 	// 	NewSplashScreen("sandbox:splash.png", &SplashCallback, 2.0)
 	// );
-	SceneManager_AddScene(TitleScreenScene());
+	if (!engine.server) {
+		SceneManager_AddScene(TitleScreenScene());
+	}
 
 	while (engine.running) {
 		Engine_Update();

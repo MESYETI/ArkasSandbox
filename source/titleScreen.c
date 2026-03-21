@@ -106,7 +106,18 @@ static void PlayButton(UI_Button* this, uint8_t button) {
 }
 
 static char serverIP[64];
-static char serverPort[16];
+static char serverPort[16] = "16709";
+
+static void JoinButton(UI_Button* this, uint8_t button) {
+	(void) this;
+	if (button != 0) return;
+
+	uint16_t port = (uint16_t) atoi(serverPort);
+	Client_StartINet(serverIP, port);
+
+	SceneManager_SchedulePop();
+	StartNetGame();
+}
 
 static void JoinGameButton(UI_Button* this, uint8_t button) {
 	(void) this;
@@ -127,7 +138,7 @@ static void JoinGameButton(UI_Button* this, uint8_t button) {
 		UI_NewTextInput(serverPort, sizeof(serverPort))
 	));
 	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
-		UI_NewButton("Join", false, NULL)
+		UI_NewButton("Join", false, &JoinButton)
 	));
 }
 

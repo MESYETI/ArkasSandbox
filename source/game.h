@@ -5,5 +5,6 @@
 
 Scene GameScene(void);
 void  StartLocalGame(bool inet);
+void  StartNetGame(void);
 
 #endif
