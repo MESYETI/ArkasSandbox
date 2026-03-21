@@ -6,6 +6,7 @@
 #include <Arkas/client.h>
 #include <Arkas/config.h>
 #include <Arkas/engine.h>
+#include <Arkas/server.h>
 #include <Arkas/skybox.h>
 #include <Arkas/backend.h>
 #include <Arkas/ui/label.h>
@@ -14,6 +15,7 @@
 #include <Arkas/ui/checkBox.h>
 #include <Arkas/ui/textInput.h>
 #include <Arkas/resources.h>
+#include "game.h"
 #include "titleScreen.h"
 
 static bool          menuOpen;
@@ -52,6 +54,16 @@ static UI_ListBoxItem* mapList;
 static ResourceFile*   maps;
 static size_t          mapsSize;
 
+static void StartGameButton(UI_Button* this, uint8_t button) {
+	(void) this;
+	if (button != 0) return;
+
+	server.mapPath = ConcatString("maps:", mapSelection);
+
+	SceneManager_SchedulePop();
+	StartLocalGame(inetServer);
+}
+
 static void PlayButton(UI_Button* this, uint8_t button) {
 	(void) this;
 	if (button != 0) return;
@@ -71,7 +83,7 @@ static void PlayButton(UI_Button* this, uint8_t button) {
 	UI_RowUpdate(row);
 
 	row = UI_ContainerAddRow(menuCon, 0);
-	UI_RowAddElement(row, UI_NewButton("Start Game", false, NULL));
+	UI_RowAddElement(row, UI_NewButton("Start Game", false, &StartGameButton));
 	UI_RowUpdate(row);
 
 	UI_Row* selectRow = &menuCon->rows[1];
@@ -102,12 +114,6 @@ static void JoinGameButton(UI_Button* this, uint8_t button) {
 
 	OpenMenu();
 
-	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
-		UI_NewLabel(&engine.font, "Username:", 0)
-	));
-	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
-		UI_NewTextInput(client.name, sizeof(client.name))
-	));
 	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
 		UI_NewLabel(&engine.font, "Server IP:", 0)
 	));
@@ -151,6 +157,13 @@ static void OptionsButton(UI_Button* this, uint8_t button) {
 	UI_RowAddElement(row, UI_NewButton("2", false, &UIScaleButton));
 	UI_RowAddElement(row, UI_NewButton("3", false, &UIScaleButton));
 	UI_RowUpdate(row);
+
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewLabel(&engine.font, "Username:", 0)
+	));
+	UI_RowUpdate(UI_ContainerAddSingleElemRow(menuCon, 0,
+		UI_NewTextInput(client.name, sizeof(client.name))
+	));
 
 	row = UI_ContainerAddRow(menuCon, 0);
 	UI_RowAddElement(row, UI_NewButton("Save settings", false, NULL));
