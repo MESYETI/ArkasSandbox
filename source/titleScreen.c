@@ -115,6 +115,8 @@ static void JoinButton(UI_Button* this, uint8_t button) {
 	uint16_t port = (uint16_t) atoi(serverPort);
 	Client_StartINet(serverIP, port);
 
+	Log("Joining %s : %d", serverIP, port);
+
 	SceneManager_SchedulePop();
 	StartNetGame();
 }
